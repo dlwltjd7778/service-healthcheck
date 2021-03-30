@@ -1,4 +1,4 @@
-package com.opsnow.healthcheck.service.extension;
+package com.opsnow.healthcheck.service.incident;
 
 import com.opsnow.healthcheck.common.Constants;
 import com.opsnow.healthcheck.model.alertnow.EventId;
@@ -16,7 +16,7 @@ import java.util.Iterator;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExtensionService {
+public class IncidentService {
 
     private final EventIdService eventIdService;
     private final IntegrationPayloadService integrationPayloadService;
@@ -56,27 +56,23 @@ public class ExtensionService {
             // eventIdList를 순회한다.
             EventId eventIdObj = iterList.next();
             String eventId = eventIdObj.getEventId();
-            boolean deleteYN = true; // 기본값은 확인한 id 는 리스트에서 삭제한다.
 
             // 하나의 eventId 로 저장된 정보 불러온다.
             IntegrationPayload integrationPayload = integrationPayloadService.getIntegrationPayloadByEventId(eventId);
+            if (integrationPayload==null) continue;
             String nowStatus = integrationPayload.getIncidentCreationStatus();
-            switch (nowStatus){
-                case Constants.INCIDENT_CREATED:
-                    eventIdService.deleteEventCheckListByEventId(eventId); // 생성된 상태면 삭제해주기
-                    break;
-                case Constants.INCIDENT_NOT_CREATED:
-                    if(compareTimeZone(integrationPayload.getIntegrationCallTime(), ZonedDateTime.now())){
-                        deleteYN = false;
-                         // 아직 5분 안지났으면 아무것도 하지않는다.
-                    } else {
-                        integrationPayloadService.changeIncidentStatus(eventId,Constants.INCIDENT_TIMEOUT); // 5분 지났으면 timeout으로 상태 변경
-                        //pagerduty 발송
-//                        pagerDutyService.sendPagerDuty();
-                    }
-                    break;
+            if (nowStatus.equals(Constants.INCIDENT_NOT_CREATED)){
+                if(compareTimeZone(integrationPayload.getIntegrationCallTime(), ZonedDateTime.now())){
+                    continue;
+                     // 아직 5분 안지났으면 아무것도 하지않는다.
+                } else {
+                    integrationPayloadService.changeIncidentStatus(eventId,Constants.INCIDENT_TIMEOUT); // 5분 지났으면 timeout으로 상태 변경
+                    //pagerduty 발송
+                    pagerDutyService.sendPagerDuty(eventId,"INCIDENTJOB-TIMEOUT");
+                }
             }
-            if(deleteYN) eventIdService.deleteEventCheckListByEventId(eventId);
+            // CREATED 상태와 TIMEOUT 상태는 리스트에서 지운다.
+            eventIdService.deleteEventCheckListByEventId(eventId);
         }
 
     }

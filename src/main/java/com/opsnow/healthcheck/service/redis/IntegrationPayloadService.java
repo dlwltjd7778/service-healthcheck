@@ -31,7 +31,7 @@ public class IntegrationPayloadService {
     }
 
     // eventId를 가지고 조회
-    public IntegrationPayload getIntegrationPayloadByEventId(String eventId){
+    public IntegrationPayload getIntegrationPayloadByEventId(String eventId) {
         Optional<IntegrationPayload> integrationPayload = payloadRepository.findById(eventId);
         if(integrationPayload.isPresent()){
             return integrationPayload.get();
