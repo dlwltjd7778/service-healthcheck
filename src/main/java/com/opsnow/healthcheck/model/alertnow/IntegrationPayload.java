@@ -1,7 +1,7 @@
 package com.opsnow.healthcheck.model.alertnow;
 
 
-import com.opsnow.healthcheck.common.Constants;
+import com.opsnow.healthcheck.common.constants.Constants;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;

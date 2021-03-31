@@ -1,4 +1,4 @@
-package com.opsnow.healthcheck.common;
+package com.opsnow.healthcheck.common.constants;
 
 public class Constants {
 

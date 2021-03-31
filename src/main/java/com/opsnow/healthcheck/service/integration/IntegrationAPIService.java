@@ -1,7 +1,7 @@
 package com.opsnow.healthcheck.service.integration;
 
 import com.opsnow.healthcheck.common.CallIntegrationException;
-import com.opsnow.healthcheck.common.Constants;
+import com.opsnow.healthcheck.common.constants.Constants;
 import com.opsnow.healthcheck.common.CustomRestTemplate;
 import com.opsnow.healthcheck.service.pagerduty.PagerDutyService;
 import com.opsnow.healthcheck.service.redis.EventIdService;

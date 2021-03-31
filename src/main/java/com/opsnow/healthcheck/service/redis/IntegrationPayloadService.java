@@ -1,6 +1,6 @@
 package com.opsnow.healthcheck.service.redis;
 
-import com.opsnow.healthcheck.common.Constants;
+import com.opsnow.healthcheck.common.constants.Constants;
 import com.opsnow.healthcheck.model.alertnow.IntegrationPayload;
 import com.opsnow.healthcheck.repository.PayloadRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,10 +33,7 @@ public class IntegrationPayloadService {
     // eventId를 가지고 조회
     public IntegrationPayload getIntegrationPayloadByEventId(String eventId){
         Optional<IntegrationPayload> integrationPayload = payloadRepository.findById(eventId);
-        if(integrationPayload.isPresent()){
-            return integrationPayload.get();
-        }
-        return null;
+        return integrationPayload.orElse(null);
     }
 
     public void changeIncidentStatus(String eventId, String status){

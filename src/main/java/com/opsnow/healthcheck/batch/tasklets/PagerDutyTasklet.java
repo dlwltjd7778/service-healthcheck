@@ -21,7 +21,7 @@ public class PagerDutyTasklet implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         log.info("PagerDutyTasklet 실행");
-//        pagerDutyService.sendPagerDuty();
+        pagerDutyService.sendPagerDuty();
         return RepeatStatus.FINISHED;
     }
 

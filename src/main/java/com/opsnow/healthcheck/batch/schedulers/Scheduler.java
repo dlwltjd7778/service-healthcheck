@@ -2,7 +2,7 @@ package com.opsnow.healthcheck.batch.schedulers;
 
 import com.opsnow.healthcheck.batch.jobs.IncidentJobConfig;
 import com.opsnow.healthcheck.batch.jobs.IntegrationJobConfig;
-import com.opsnow.healthcheck.common.Constants;
+import com.opsnow.healthcheck.common.constants.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobExecutionException;

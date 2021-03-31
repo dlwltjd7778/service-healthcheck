@@ -1,6 +1,6 @@
 package com.opsnow.healthcheck.service.event;
 
-import com.opsnow.healthcheck.common.Constants;
+import com.opsnow.healthcheck.common.constants.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
