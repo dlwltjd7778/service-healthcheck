@@ -28,20 +28,21 @@ public class IntegrationAPIService {
 
         ZonedDateTime zonedDateTime;
         Map<String, String> reqBody = integrationService.makeStandardPayload();
+        String eventId = reqBody.get("event_id");
+        String summary = reqBody.get("summary");
         zonedDateTime = ZonedDateTime.now();
 
         // uuid Redis에 저장
-        integrationPayloadService.saveEventData(reqBody.get("event_id"), reqBody.get("summary"), type, zonedDateTime, Constants.STANDARD_INTEGRATION_URL);
-        eventIdService.addEventCheckList(reqBody.get("event_id"));
+        integrationPayloadService.saveEventData(eventId, summary, type, zonedDateTime, Constants.STANDARD_INTEGRATION_URL);
+        eventIdService.addEventCheckList(eventId);
 
         log.warn("start calling integration");
+        Map<Object, Object> resMap = customRestTemplate.callPostRestTemplate(reqBody, Constants.STANDARD_INTEGRATION_URL);
 
-//        Map<Object, Object> resMap = customRestTemplate.callPostRestTemplate(reqBody, Constants.STANDARD_INTEGRATION_URL);
-//
-//        if (!((200) == (Integer) resMap.get("code")) && "ok".equals(resMap.get("msg"))){
-//            pagerDutyService.sendPagerDuty(reqBody.get("event_id"), "integration 호출 시 문제 발생 (not 200, ok)");
-//            throw new CallIntegrationException();
-//        }
+        if (!((200) == (Integer) resMap.get("code")) && "ok".equals(resMap.get("msg"))){
+            pagerDutyService.sendPagerDuty(eventId, "integration 호출 시 문제 발생 (not 200, ok)");
+            throw new CallIntegrationException();
+        }
 
     }
 

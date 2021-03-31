@@ -30,6 +30,6 @@ public class Constants {
     public final static int SLA_MINUTES = 5;
 
     // Redis TTL
-    public final static int INTEGRATION_PAYLOAD_TTL = 30;
+    public final static int INTEGRATION_PAYLOAD_TTL = 1000000000;
 
 }
