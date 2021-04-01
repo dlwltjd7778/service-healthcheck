@@ -3,6 +3,7 @@ package com.opsnow.healthcheck.service.pagerduty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opsnow.healthcheck.common.constants.Constants;
 import com.opsnow.healthcheck.common.CustomRestTemplate;
+import com.opsnow.healthcheck.model.alertnow.IntegrationPayload;
 import com.opsnow.healthcheck.model.pagerduty.PagerDutyPayload;
 import com.opsnow.healthcheck.model.pagerduty.Payload;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,26 @@ public class PagerDutyService {
         ObjectMapper objectMapper = new ObjectMapper();
         Map reqBody = objectMapper.convertValue(payload,Map.class);
         customRestTemplate.callPostRestTemplate(reqBody, Constants.PAGERDUTY_URL);
+    }
+
+
+    public void sendPagerDuty(IntegrationPayload integrationPayload, String msg) {
+        String summary = String.format(Constants.NOTIFICATION_SUMMARY_FORMAT
+                                        ,integrationPayload.getEnvironment()
+                                        ,integrationPayload.getIntegrationType()
+                                        ,integrationPayload.getEventId()
+                                        ,msg);
+        PagerDutyPayload payload = PagerDutyPayload.builder().payload(
+                Payload.builder()
+                        .summary(summary)
+                        .source(integrationPayload.getEventId())
+                        .custom_details(integrationPayload)
+                        .build())
+                .build();
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map reqBody = objectMapper.convertValue(payload,Map.class);
+        customRestTemplate.callPostRestTemplate(reqBody, Constants.PAGERDUTY_URL);
+        log.info("PAGERDUTY SUMMARY >> {}", summary);
     }
 
     //임시......

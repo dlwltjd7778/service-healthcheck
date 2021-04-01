@@ -1,6 +1,7 @@
 package com.opsnow.healthcheck.service.incident;
 
 import com.opsnow.healthcheck.common.constants.Constants;
+import com.opsnow.healthcheck.common.constants.PagerDutyEnum;
 import com.opsnow.healthcheck.model.alertnow.EventId;
 import com.opsnow.healthcheck.model.alertnow.IntegrationPayload;
 import com.opsnow.healthcheck.service.pagerduty.PagerDutyService;
@@ -11,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
-import java.util.Iterator;
 
 @Slf4j
 @Service
@@ -25,23 +25,22 @@ public class IncidentService {
     // 전체 로직 메소드
     public void controllerFacade(String eventId, ZonedDateTime controllerTime){
         // alertId로 redis에서 조회하기
-        log.info("상태 변경 대상 id > {}", eventId);
         IntegrationPayload integrationPayload = integrationPayloadService.getIntegrationPayloadByEventId(eventId);
-
 
         if(integrationPayload==null){
             // pagerduty..? 레디스에 아이디가 없다.....
-            pagerDutyService.sendPagerDuty(eventId, "레디스에 Id가 없다..");
+            pagerDutyService.sendPagerDuty(eventId, PagerDutyEnum.CauseMsg.CANNOT_FIND_EVENT_ID_IN_WEBHOOK.getCauseMsg());
         } else {
             String status = integrationPayload.getIncidentCreationStatus();
             // 시간 비교
             if(compareTimeZone(integrationPayload.getIntegrationCallTime(), controllerTime)){ // 정상일 때
                 integrationPayloadService.changeIncidentStatus(eventId, Constants.INCIDENT_CREATED); // 상태 변경
-                log.warn("{} 의 상태를 created 로 변경", eventId);
+                log.warn("{} 의 incidentStatus 를 not_created -> created 로 변경", eventId);
 
             } else { // 5분 지났을 때
                 integrationPayloadService.changeIncidentStatus(eventId, Constants.INCIDENT_TIMEOUT); // 상태 변경
-                pagerDutyService.sendPagerDuty(eventId, "5분지났는데 안만들어졌다니..");
+                pagerDutyService.sendPagerDuty(integrationPayloadService.getIntegrationPayloadByEventId(eventId),
+                        PagerDutyEnum.CauseMsg.TIMEOUT_IN_WEBHOOK.getCauseMsg());
             }
         }
 
@@ -58,6 +57,7 @@ public class IncidentService {
             // 하나의 eventId 로 저장된 정보 불러온다.
             IntegrationPayload integrationPayload = integrationPayloadService.getIntegrationPayloadByEventId(eventId);
             if (integrationPayload == null) continue;
+
             String nowStatus = integrationPayload.getIncidentCreationStatus();
             if (nowStatus.equals(Constants.INCIDENT_NOT_CREATED)) {
                 if (compareTimeZone(integrationPayload.getIntegrationCallTime(), ZonedDateTime.now())) {
@@ -66,7 +66,7 @@ public class IncidentService {
                 } else {
                     integrationPayloadService.changeIncidentStatus(eventId, Constants.INCIDENT_TIMEOUT); // 5분 지났으면 timeout으로 상태 변경
                     //pagerduty 발송
-                    pagerDutyService.sendPagerDuty(eventId, "INCIDENTJOB-TIMEOUT");
+                    pagerDutyService.sendPagerDuty(integrationPayload, PagerDutyEnum.CauseMsg.TIMEOUT_IN_INCIDENTJOB.getCauseMsg());
                 }
             }
             // CREATED 상태와 TIMEOUT 상태는 리스트에서 지운다.
@@ -76,9 +76,6 @@ public class IncidentService {
     }
 
     public boolean compareTimeZone(ZonedDateTime integrationCallTime, ZonedDateTime compareTime){
-//        log.info("integrationCallTime : {}", integrationCallTime);
-//        log.info("integrationCallTime+5min : {}", integrationCallTime.plusMinutes(5));
-//        log.info("compareTime : {}", compareTime);
         return integrationCallTime.plusMinutes(Constants.SLA_MINUTES).isAfter(compareTime);
         // 인티그레이션 호출한 시간 + 5분 보다 controllerTime 이 더 이전이면 true >> 5분 안지났으면 true
     }
