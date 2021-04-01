@@ -20,8 +20,8 @@ public class IncidentTasklet implements Tasklet {
     private final IncidentService incidentService;
 
     @Override
-    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        log.info("incidentTasklet 실행");
+    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) {
+        log.info("IncidentTasklet 실행");
 
         incidentService.jobFacade();
 

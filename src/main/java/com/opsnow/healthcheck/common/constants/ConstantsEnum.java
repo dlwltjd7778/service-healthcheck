@@ -7,8 +7,9 @@ public class ConstantsEnum {
 
     // 개발 환경별 도메인
     public enum EnvType {
-        DEV("https://alertnowitgrdev.opsnow.com"),
-        PRD("domain-prd");
+        DEV("alertnowitgrdev.opsnow.com"),
+        PRD("alertnowitgr.opsnow.com"),
+        SEC("alertnowitgr.sec-alertnow.com");
 
         private final String domain;
 
@@ -25,20 +26,19 @@ public class ConstantsEnum {
     // Integration type
     public enum IntegrationType {
         standard,
-        datadog,
-        cloudwatch
+        datadog
     }
 
-    // IntegrationUrl 실제 사용되는 URL
-    public enum IntegrationUrl {
+    // IntegrationAPIKey 실제 사용되는 URL
+    public enum IntegrationAPIKey {
         DEV_STANDARD_URL(EnvType.DEV, IntegrationType.standard, "6672be9c48620311eb1b86430a960e68e6c8"),
-        PRD_TEST_URL(EnvType.PRD, IntegrationType.datadog,"1234abcd");
+        DEV_STANDARD_URL2(EnvType.DEV, IntegrationType.standard, "830c7faf292a3511eb7b86420a960e68e6c8");
 
         private final String apiKey;
         private final EnvType envType;
         private final IntegrationType integrationType;
 
-        IntegrationUrl(EnvType envType, IntegrationType integrationType, String apiKey) {
+        IntegrationAPIKey(EnvType envType, IntegrationType integrationType, String apiKey) {
             this.envType = envType;
             this.integrationType = integrationType;
             this.apiKey = apiKey;
@@ -58,14 +58,14 @@ public class ConstantsEnum {
 
         public List<String> getAllUrl(){
             List<String> result = new ArrayList<>();
-            for (IntegrationUrl url : values()){
+            for (IntegrationAPIKey url : values()){
                 result.add(getUrl(url));
             }
             return result;
         }
 
     }
-    public static String getUrl(IntegrationUrl url) {
+    public static String getUrl(IntegrationAPIKey url) {
         return String.format(Constants.INTEGRATION_URL_FORMAT, url.getEnvType().getDomain(), url.getIntegrationType(), url.getApiKey());
     }
 

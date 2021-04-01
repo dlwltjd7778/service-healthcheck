@@ -4,6 +4,8 @@ import com.opsnow.healthcheck.common.CallIntegrationException;
 import com.opsnow.healthcheck.common.constants.Constants;
 import com.opsnow.healthcheck.common.CustomRestTemplate;
 import com.opsnow.healthcheck.common.constants.ConstantsEnum;
+import com.opsnow.healthcheck.common.constants.PagerDutyEnum;
+import com.opsnow.healthcheck.model.alertnow.IntegrationPayload;
 import com.opsnow.healthcheck.service.pagerduty.PagerDutyService;
 import com.opsnow.healthcheck.service.redis.EventIdService;
 import com.opsnow.healthcheck.service.redis.IntegrationPayloadService;
@@ -25,24 +27,23 @@ public class IntegrationAPIService {
     private final IntegrationPayloadService integrationPayloadService;
     private final PagerDutyService pagerDutyService;
 
-    public void sendIntegrationAPI(String type) throws Exception {
+    public void sendIntegrationAPI() throws Exception {
 
         ZonedDateTime zonedDateTime;
         Map<String, String> reqBody = integrationService.makeStandardPayload();
         String eventId = reqBody.get("event_id");
         String summary = reqBody.get("summary");
         zonedDateTime = ZonedDateTime.now();
-        String url = ConstantsEnum.getUrl(ConstantsEnum.IntegrationUrl.DEV_STANDARD_URL);
 
         // uuid Redis에 저장
-        integrationPayloadService.saveEventData(eventId, summary, type, zonedDateTime, url);
+        IntegrationPayload integrationPayload = integrationPayloadService.saveEventData(eventId, summary, Constants.INTEGRATION_TYPE, zonedDateTime, Constants.INTEGRATION_URL, Constants.INTEGRATION_ENVIRONMENT);
         eventIdService.addEventCheckList(eventId);
 
         log.warn("start calling integration");
-        Map<Object, Object> resMap = customRestTemplate.callPostRestTemplate(reqBody, url);
+        Map<Object, Object> resMap = customRestTemplate.callPostRestTemplate(reqBody, Constants.INTEGRATION_URL);
 
         if (!((200) == (Integer) resMap.get("code")) && "ok".equals(resMap.get("msg"))){
-            pagerDutyService.sendPagerDuty(eventId, "integration 호출 시 문제 발생 (not 200, ok)");
+            pagerDutyService.sendPagerDuty(integrationPayload, PagerDutyEnum.CauseMsg.NOT_200_OK.getCauseMsg());
             throw new CallIntegrationException();
         }
 

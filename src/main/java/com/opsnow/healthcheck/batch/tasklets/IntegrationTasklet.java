@@ -1,7 +1,11 @@
 package com.opsnow.healthcheck.batch.tasklets;
 
-import com.opsnow.healthcheck.common.CallIntegrationException;
+import com.opsnow.healthcheck.common.constants.Constants;
+import com.opsnow.healthcheck.common.constants.ConstantsEnum;
+import com.opsnow.healthcheck.common.constants.PagerDutyEnum;
 import com.opsnow.healthcheck.service.integration.IntegrationAPIService;
+import com.opsnow.healthcheck.service.pagerduty.PagerDutyService;
+import com.opsnow.healthcheck.service.redis.IntegrationPayloadService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +15,6 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -20,13 +22,23 @@ public class IntegrationTasklet implements Tasklet {
 
     @NonNull
     private final IntegrationAPIService integrationAPIService;
+    private final PagerDutyService s;
+    private final IntegrationPayloadService ips;
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        log.info("IntegrationTasklet 실행");
 
+        for(ConstantsEnum.IntegrationAPIKey apiKey : ConstantsEnum.IntegrationAPIKey.values()){
+            Constants.INTEGRATION_ENVIRONMENT = apiKey.getEnvType().toString();
+            Constants.INTEGRATION_TYPE = apiKey.getIntegrationType().toString();
+            Constants.INTEGRATION_URL = ConstantsEnum.getUrl(apiKey);
+            log.info("IntegrationTasklet 실행 : ENV - {}, INTEGRATION_TYPE - {}, INTEGRATION_URL - {}"
+                    ,Constants.INTEGRATION_ENVIRONMENT
+                    ,Constants.INTEGRATION_TYPE
+                    ,Constants.INTEGRATION_URL);
+            integrationAPIService.sendIntegrationAPI();
+        }
 
-        integrationAPIService.sendIntegrationAPI("standard");
         return RepeatStatus.FINISHED;
     }
 

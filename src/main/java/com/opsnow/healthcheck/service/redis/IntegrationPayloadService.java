@@ -17,7 +17,7 @@ public class IntegrationPayloadService {
 
     private final PayloadRepository payloadRepository;
 
-    public void saveEventData(String eventId, String eventSummary, String integrationType, ZonedDateTime integrationCallTime, String url){
+    public IntegrationPayload saveEventData(String eventId, String eventSummary, String integrationType, ZonedDateTime integrationCallTime, String url, String env){
         IntegrationPayload integrationPayload = IntegrationPayload.builder()
                 .eventId(eventId)
                 .eventSummary(eventSummary)
@@ -25,9 +25,11 @@ public class IntegrationPayloadService {
                 .url(url)
                 .integrationCallTime(integrationCallTime)
                 .incidentCreationStatus(Constants.INCIDENT_NOT_CREATED)
+                .environment(env)
                 .build();
         payloadRepository.save(integrationPayload);
         log.info("save IntegrationPayload in Redis : {}", integrationPayload );
+        return integrationPayload;
     }
 
     // eventId를 가지고 조회

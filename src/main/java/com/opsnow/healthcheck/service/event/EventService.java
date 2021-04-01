@@ -13,8 +13,8 @@ import java.util.UUID;
 public class EventService {
 
     // event_id summary 생성
-    public String getEventSummary(){
-        return String.format(Constants.SUMMARY_FORMAT, Constants.ENVIRONMENT);
+    public String getEventSummary(String uuid){
+        return String.format(Constants.SUMMARY_FORMAT, Constants.INTEGRATION_ENVIRONMENT,Constants.INTEGRATION_TYPE, uuid);
     }
 
     // event_id 생성
