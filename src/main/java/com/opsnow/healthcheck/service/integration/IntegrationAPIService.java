@@ -3,6 +3,7 @@ package com.opsnow.healthcheck.service.integration;
 import com.opsnow.healthcheck.common.CallIntegrationException;
 import com.opsnow.healthcheck.common.constants.Constants;
 import com.opsnow.healthcheck.common.CustomRestTemplate;
+import com.opsnow.healthcheck.common.constants.ConstantsEnum;
 import com.opsnow.healthcheck.service.pagerduty.PagerDutyService;
 import com.opsnow.healthcheck.service.redis.EventIdService;
 import com.opsnow.healthcheck.service.redis.IntegrationPayloadService;
@@ -31,13 +32,14 @@ public class IntegrationAPIService {
         String eventId = reqBody.get("event_id");
         String summary = reqBody.get("summary");
         zonedDateTime = ZonedDateTime.now();
+        String url = ConstantsEnum.getUrl(ConstantsEnum.IntegrationUrl.DEV_STANDARD_URL);
 
         // uuid Redis에 저장
-        integrationPayloadService.saveEventData(eventId, summary, type, zonedDateTime, Constants.STANDARD_INTEGRATION_URL);
+        integrationPayloadService.saveEventData(eventId, summary, type, zonedDateTime, url);
         eventIdService.addEventCheckList(eventId);
 
         log.warn("start calling integration");
-        Map<Object, Object> resMap = customRestTemplate.callPostRestTemplate(reqBody, Constants.STANDARD_INTEGRATION_URL);
+        Map<Object, Object> resMap = customRestTemplate.callPostRestTemplate(reqBody, url);
 
         if (!((200) == (Integer) resMap.get("code")) && "ok".equals(resMap.get("msg"))){
             pagerDutyService.sendPagerDuty(eventId, "integration 호출 시 문제 발생 (not 200, ok)");

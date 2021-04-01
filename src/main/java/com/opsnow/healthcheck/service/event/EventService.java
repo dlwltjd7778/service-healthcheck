@@ -3,7 +3,6 @@ package com.opsnow.healthcheck.service.event;
 import com.opsnow.healthcheck.common.constants.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -13,12 +12,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EventService {
 
-    @Value("${spring.profiles.active}")
-    String profile;
-
     // event_id summary 생성
     public String getEventSummary(){
-        return String.format(Constants.SUMMARY_FORMAT, profile);
+        return String.format(Constants.SUMMARY_FORMAT, Constants.ENVIRONMENT);
     }
 
     // event_id 생성

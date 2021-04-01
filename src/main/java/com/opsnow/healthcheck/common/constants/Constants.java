@@ -2,8 +2,9 @@ package com.opsnow.healthcheck.common.constants;
 
 public class Constants {
 
-    // Integration URL
-    public final static String STANDARD_INTEGRATION_URL = "https://alertnowitgrdev.opsnow.com/integration/standard/v1/6672be9c48620311eb1b86430a960e68e6c8";
+    // Integration URL Format
+    public final static String INTEGRATION_URL_FORMAT = "%s/integration/%s/v1/%s";
+    public final static String NOTIFICATION_SUMMARY_FORMAT = "[%s][%s#%s] %s";
 
 
     // PagerDuty URL, payload
@@ -31,5 +32,8 @@ public class Constants {
 
     // Redis TTL
     public final static int INTEGRATION_PAYLOAD_TTL = 1000000000;
+
+    public static String ENVIRONMENT;
+    public static String INTEGRATION_TYPE;
 
 }

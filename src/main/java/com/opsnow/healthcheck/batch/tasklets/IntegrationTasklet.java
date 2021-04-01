@@ -11,6 +11,8 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -22,6 +24,8 @@ public class IntegrationTasklet implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         log.info("IntegrationTasklet 실행");
+
+
         integrationAPIService.sendIntegrationAPI("standard");
         return RepeatStatus.FINISHED;
     }

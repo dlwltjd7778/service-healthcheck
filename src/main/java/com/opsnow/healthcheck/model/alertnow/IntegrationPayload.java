@@ -16,6 +16,7 @@ public class IntegrationPayload {
     @Id
     private String eventId;                      // uuid
     private String eventSummary;                 // summary
+    private String environment;                  // env
     private String url;                          // url
     private String integrationType;              // integration type
     private ZonedDateTime integrationCallTime;   // call time
