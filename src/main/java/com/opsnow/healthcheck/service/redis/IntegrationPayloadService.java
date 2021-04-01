@@ -38,6 +38,10 @@ public class IntegrationPayloadService {
         return integrationPayload.orElse(null);
     }
 
+    public void deleteIntegrationPayloadByEventId(String eventId){
+        payloadRepository.deleteById(eventId);
+    }
+    
     public void changeIncidentStatus(String eventId, String status){
         IntegrationPayload integrationPayload = getIntegrationPayloadByEventId(eventId);
         integrationPayload.setIncidentCreationStatus(status);

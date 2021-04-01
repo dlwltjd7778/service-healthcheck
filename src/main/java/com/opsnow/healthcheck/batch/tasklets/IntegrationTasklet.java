@@ -2,7 +2,6 @@ package com.opsnow.healthcheck.batch.tasklets;
 
 import com.opsnow.healthcheck.common.constants.Constants;
 import com.opsnow.healthcheck.common.constants.ConstantsEnum;
-import com.opsnow.healthcheck.common.constants.PagerDutyEnum;
 import com.opsnow.healthcheck.service.integration.IntegrationAPIService;
 import com.opsnow.healthcheck.service.pagerduty.PagerDutyService;
 import com.opsnow.healthcheck.service.redis.IntegrationPayloadService;

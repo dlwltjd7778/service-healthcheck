@@ -1,10 +1,7 @@
 package com.opsnow.healthcheck.service.integration;
 
-import com.opsnow.healthcheck.common.CallIntegrationException;
-import com.opsnow.healthcheck.common.constants.Constants;
 import com.opsnow.healthcheck.common.CustomRestTemplate;
-import com.opsnow.healthcheck.common.constants.ConstantsEnum;
-import com.opsnow.healthcheck.common.constants.PagerDutyEnum;
+import com.opsnow.healthcheck.common.constants.Constants;
 import com.opsnow.healthcheck.model.alertnow.IntegrationPayload;
 import com.opsnow.healthcheck.service.pagerduty.PagerDutyService;
 import com.opsnow.healthcheck.service.redis.EventIdService;
@@ -42,11 +39,10 @@ public class IntegrationAPIService {
         log.warn("start calling integration");
         Map<Object, Object> resMap = customRestTemplate.callPostRestTemplate(reqBody, Constants.INTEGRATION_URL);
 
-        if (!((200) == (Integer) resMap.get("code")) && "ok".equals(resMap.get("msg"))){
-            pagerDutyService.sendPagerDuty(integrationPayload, PagerDutyEnum.CauseMsg.NOT_200_OK.getCauseMsg());
-            throw new CallIntegrationException();
+        if (!resMap.containsKey("code") || !((200) == (Integer) resMap.get("code")) && "ok".equals(resMap.get("msg"))){
+            eventIdService.deleteEventCheckListByEventId(eventId); // 체크리스트에서 삭제해주자
+            integrationPayloadService.deleteIntegrationPayloadByEventId(eventId); // 실제 저장된 데이터에서 삭제해주자
+            pagerDutyService.sendPagerDuty(integrationPayload, (String)resMap.get("msg"));
         }
-
     }
-
 }

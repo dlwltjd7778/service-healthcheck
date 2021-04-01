@@ -3,7 +3,7 @@ package com.opsnow.healthcheck.common.constants;
 public class Constants {
 
     // Format
-    public final static String INTEGRATION_URL_FORMAT = "https://%s/integration/%s/v1/%s";
+    public final static String INTEGRATION_URL_FORMAT = "https://%s/integrations/%s/v1/%s";
     public final static String NOTIFICATION_SUMMARY_FORMAT = "[%s][%s#%s] %s";
     // Integration payload - Summary Format
     public final static String SUMMARY_FORMAT = "[%s][%s#%s] Status Test";
