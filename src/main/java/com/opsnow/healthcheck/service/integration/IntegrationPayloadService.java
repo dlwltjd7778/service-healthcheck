@@ -4,5 +4,5 @@ import java.util.Map;
 
 public interface IntegrationPayloadService {
 
-    public Map<String, String> makeStandardPayload();
+    Map<String, String> makePayload();
 }

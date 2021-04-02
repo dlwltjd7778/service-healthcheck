@@ -22,13 +22,13 @@ public class IncidentJobConfig {
     @Bean
     public Job incidentJob(){
         return jobBuilderFactory.get("incidentJob")
-                .start(chkIncidentCreationStep())
+                .start(chkIncidentStep())
                 .build();
     }
 
     @Bean
-    public Step chkIncidentCreationStep(){
-        return stepBuilderFactory.get("chkIncidentCreation")
+    public Step chkIncidentStep(){
+        return stepBuilderFactory.get("chkIncidentStep")
                 .tasklet(incidentTasklet)
                 .allowStartIfComplete(true)
                 .build();

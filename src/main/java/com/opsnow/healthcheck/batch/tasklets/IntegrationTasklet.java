@@ -1,7 +1,10 @@
 package com.opsnow.healthcheck.batch.tasklets;
 
-import com.opsnow.healthcheck.common.CallIntegrationException;
+import com.opsnow.healthcheck.common.constants.Constants;
+import com.opsnow.healthcheck.common.constants.ConstantsEnum;
 import com.opsnow.healthcheck.service.integration.IntegrationAPIService;
+import com.opsnow.healthcheck.service.notification.NotificationService;
+import com.opsnow.healthcheck.service.redis.PayloadRedisService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,11 +21,23 @@ public class IntegrationTasklet implements Tasklet {
 
     @NonNull
     private final IntegrationAPIService integrationAPIService;
+    private final NotificationService s;
+    private final PayloadRedisService ips;
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        log.info("IntegrationTasklet 실행");
-        integrationAPIService.sendIntegrationAPI("standard");
+
+        for(ConstantsEnum.IntegrationAPIKey apiKey : ConstantsEnum.IntegrationAPIKey.values()){
+            Constants.INTEGRATION_ENVIRONMENT = apiKey.getEnvType().toString();
+            Constants.INTEGRATION_TYPE = apiKey.getIntegrationType().toString();
+            Constants.INTEGRATION_URL = ConstantsEnum.getUrl(apiKey);
+            log.info("IntegrationTasklet 실행 : ENV - {}, INTEGRATION_TYPE - {}, INTEGRATION_URL - {}"
+                    ,Constants.INTEGRATION_ENVIRONMENT
+                    ,Constants.INTEGRATION_TYPE
+                    ,Constants.INTEGRATION_URL);
+            integrationAPIService.sendIntegrationAPI();
+        }
+
         return RepeatStatus.FINISHED;
     }
 

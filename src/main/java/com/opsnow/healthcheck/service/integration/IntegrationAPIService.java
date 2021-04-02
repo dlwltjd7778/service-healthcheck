@@ -1,11 +1,11 @@
 package com.opsnow.healthcheck.service.integration;
 
-import com.opsnow.healthcheck.common.CallIntegrationException;
-import com.opsnow.healthcheck.common.Constants;
 import com.opsnow.healthcheck.common.CustomRestTemplate;
-import com.opsnow.healthcheck.service.pagerduty.PagerDutyService;
-import com.opsnow.healthcheck.service.redis.EventIdService;
-import com.opsnow.healthcheck.service.redis.IntegrationPayloadService;
+import com.opsnow.healthcheck.common.constants.Constants;
+import com.opsnow.healthcheck.model.alertnow.IntegrationPayload;
+import com.opsnow.healthcheck.service.notification.NotificationService;
+import com.opsnow.healthcheck.service.redis.EventIdListRedisService;
+import com.opsnow.healthcheck.service.redis.PayloadRedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,31 +19,30 @@ import java.util.Map;
 public class IntegrationAPIService {
 
     private final CustomRestTemplate customRestTemplate;
-    private final EventIdService eventIdService;
-    private final IntegrationPayloadServiceImpl integrationService;
-    private final IntegrationPayloadService integrationPayloadService;
-    private final PagerDutyService pagerDutyService;
+    private final EventIdListRedisService eventIdListRedisService;
+    private final StandardPayloadServiceImpl standardPayloadServiceImpl;
+    private final PayloadRedisService payloadRedisService;
+    private final NotificationService notificationService;
 
-    public void sendIntegrationAPI(String type) throws Exception {
+    public void sendIntegrationAPI() {
 
         ZonedDateTime zonedDateTime;
-        Map<String, String> reqBody = integrationService.makeStandardPayload();
+        Map<String, String> reqBody = standardPayloadServiceImpl.makePayload();
         String eventId = reqBody.get("event_id");
         String summary = reqBody.get("summary");
         zonedDateTime = ZonedDateTime.now();
 
         // uuid Redis에 저장
-        integrationPayloadService.saveEventData(eventId, summary, type, zonedDateTime, Constants.STANDARD_INTEGRATION_URL);
-        eventIdService.addEventCheckList(eventId);
+        IntegrationPayload integrationPayload = payloadRedisService.saveEventData(eventId, summary, Constants.INTEGRATION_TYPE, zonedDateTime, Constants.INTEGRATION_URL, Constants.INTEGRATION_ENVIRONMENT);
+        eventIdListRedisService.addEventCheckList(eventId);
 
         log.warn("start calling integration");
-        Map<Object, Object> resMap = customRestTemplate.callPostRestTemplate(reqBody, Constants.STANDARD_INTEGRATION_URL);
+        Map<Object, Object> resMap = customRestTemplate.callPostRestTemplate(reqBody, Constants.INTEGRATION_URL);
 
-        if (!((200) == (Integer) resMap.get("code")) && "ok".equals(resMap.get("msg"))){
-            pagerDutyService.sendPagerDuty(eventId, "integration 호출 시 문제 발생 (not 200, ok)");
-            throw new CallIntegrationException();
+        if (!( "ok".equals(resMap.get("msg")) && "200".equals(resMap.get("code")))){
+            eventIdListRedisService.deleteEventCheckListByEventId(eventId); // 체크리스트에서 삭제해주자
+            payloadRedisService.deleteIntegrationPayloadByEventId(eventId); // 실제 저장된 데이터에서 삭제해주자
+            notificationService.sendNotification(integrationPayload, (String)resMap.get("msg"));
         }
-
     }
-
 }
