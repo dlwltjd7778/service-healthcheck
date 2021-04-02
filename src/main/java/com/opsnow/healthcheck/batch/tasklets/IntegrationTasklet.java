@@ -3,8 +3,8 @@ package com.opsnow.healthcheck.batch.tasklets;
 import com.opsnow.healthcheck.common.constants.Constants;
 import com.opsnow.healthcheck.common.constants.ConstantsEnum;
 import com.opsnow.healthcheck.service.integration.IntegrationAPIService;
-import com.opsnow.healthcheck.service.pagerduty.PagerDutyService;
-import com.opsnow.healthcheck.service.redis.IntegrationPayloadService;
+import com.opsnow.healthcheck.service.notification.NotificationService;
+import com.opsnow.healthcheck.service.redis.PayloadRedisService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +21,8 @@ public class IntegrationTasklet implements Tasklet {
 
     @NonNull
     private final IntegrationAPIService integrationAPIService;
-    private final PagerDutyService s;
-    private final IntegrationPayloadService ips;
+    private final NotificationService s;
+    private final PayloadRedisService ips;
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {

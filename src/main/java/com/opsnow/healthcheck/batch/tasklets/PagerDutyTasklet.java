@@ -1,6 +1,6 @@
 package com.opsnow.healthcheck.batch.tasklets;
 
-import com.opsnow.healthcheck.service.pagerduty.PagerDutyService;
+import com.opsnow.healthcheck.service.notification.NotificationService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,12 +16,12 @@ import org.springframework.stereotype.Component;
 public class PagerDutyTasklet implements Tasklet {
 
     @NonNull
-    private final PagerDutyService pagerDutyService;
+    private final NotificationService notificationService;
 
     @Override
-    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) {
         log.info("PagerDutyTasklet 실행");
-        pagerDutyService.sendPagerDuty();
+        notificationService.sendNotification();
         return RepeatStatus.FINISHED;
     }
 

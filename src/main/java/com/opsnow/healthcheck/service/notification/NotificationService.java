@@ -1,4 +1,4 @@
-package com.opsnow.healthcheck.service.pagerduty;
+package com.opsnow.healthcheck.service.notification;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opsnow.healthcheck.common.constants.Constants;
@@ -15,12 +15,12 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PagerDutyService {
+public class NotificationService {
 
     private final CustomRestTemplate customRestTemplate;
     // https://jiseonglee.pagerduty.com
 
-    public void sendPagerDuty(String eventId, String msg) {
+    public void sendNotification(String eventId, String msg) {
         log.info("PAGERDUTY >> EventId : {}, msg : {}", eventId, msg);
         PagerDutyPayload payload = PagerDutyPayload.builder().payload(Payload.builder().summary(msg).source(eventId).build()).build();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -29,7 +29,7 @@ public class PagerDutyService {
     }
 
 
-    public void sendPagerDuty(IntegrationPayload integrationPayload, String msg) {
+    public void sendNotification(IntegrationPayload integrationPayload, String msg) {
         String summary = String.format(Constants.NOTIFICATION_SUMMARY_FORMAT
                                         ,integrationPayload.getEnvironment()
                                         ,integrationPayload.getIntegrationType()
@@ -49,7 +49,7 @@ public class PagerDutyService {
     }
 
     //임시......
-    public void sendPagerDuty(){
+    public void sendNotification(){
         PagerDutyPayload payload = PagerDutyPayload.builder().payload(Payload.builder().build()).build();
         ObjectMapper objectMapper = new ObjectMapper();
         Map reqBody = objectMapper.convertValue(payload,Map.class);

@@ -23,7 +23,7 @@ public class IncidentTasklet implements Tasklet {
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) {
         log.info("IncidentTasklet 실행");
 
-        incidentService.jobFacade();
+        incidentService.incidentJobFacade();
 
         return RepeatStatus.FINISHED;
     }

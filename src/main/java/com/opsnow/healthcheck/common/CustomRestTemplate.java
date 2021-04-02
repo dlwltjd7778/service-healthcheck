@@ -1,16 +1,13 @@
 package com.opsnow.healthcheck.common;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opsnow.healthcheck.common.constants.PagerDutyEnum;
+import com.opsnow.healthcheck.common.constants.NotiErrorMsg;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
@@ -27,7 +24,7 @@ public class CustomRestTemplate {
     public Map<Object, Object> callPostRestTemplate(Map<String,String> reqBody, String URL)  {
 
         Map<Object, Object> resMap = new HashMap<>();
-        RestTemplate restTemplate = restTemplateBuilder.setConnectTimeout(Duration.ofSeconds(5)).build();
+        RestTemplate restTemplate = restTemplateBuilder.setConnectTimeout(Duration.ofSeconds(10)).build();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -42,10 +39,10 @@ public class CustomRestTemplate {
             resMap = mapper.readValue(response.getBody(), Map.class);
 
         } catch (HttpStatusCodeException e){
-            resMap.put("msg", PagerDutyEnum.CauseMsg.NOT_200_OK.getCauseMsg() + " : " + e.getStatusCode().toString());
+            resMap.put("msg", NotiErrorMsg.NOT_200_OK.getNotiErrorMsg() + " : " + e.getStatusCode().toString());
             log.error("ERROR MSG - {}", resMap.get("msg"), e);
         } catch (Exception e){
-            resMap.put("msg",PagerDutyEnum.CauseMsg.INTEGRATION_API_RESTTEMPLATE_ERROR.getCauseMsg() + e.getMessage());
+            resMap.put("msg",NotiErrorMsg.INTEGRATION_API_RESTTEMPLATE_ERROR.getNotiErrorMsg() + e.getMessage());
             log.error("ERROR MSG - {}", resMap.get("msg"), e);
         }
 

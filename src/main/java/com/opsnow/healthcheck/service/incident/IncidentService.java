@@ -1,12 +1,12 @@
 package com.opsnow.healthcheck.service.incident;
 
 import com.opsnow.healthcheck.common.constants.Constants;
-import com.opsnow.healthcheck.common.constants.PagerDutyEnum;
+import com.opsnow.healthcheck.common.constants.NotiErrorMsg;
 import com.opsnow.healthcheck.model.alertnow.EventId;
 import com.opsnow.healthcheck.model.alertnow.IntegrationPayload;
-import com.opsnow.healthcheck.service.pagerduty.PagerDutyService;
-import com.opsnow.healthcheck.service.redis.EventIdService;
-import com.opsnow.healthcheck.service.redis.IntegrationPayloadService;
+import com.opsnow.healthcheck.service.notification.NotificationService;
+import com.opsnow.healthcheck.service.redis.EventIdListRedisService;
+import com.opsnow.healthcheck.service.redis.PayloadRedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,44 +18,44 @@ import java.time.ZonedDateTime;
 @RequiredArgsConstructor
 public class IncidentService {
 
-    private final EventIdService eventIdService;
-    private final IntegrationPayloadService integrationPayloadService;
-    private final PagerDutyService pagerDutyService;
+    private final EventIdListRedisService eventIdListRedisService;
+    private final PayloadRedisService payloadRedisService;
+    private final NotificationService notificationService;
 
     // 전체 로직 메소드
     public void controllerFacade(String eventId, ZonedDateTime controllerTime){
         // alertId로 redis에서 조회하기
-        IntegrationPayload integrationPayload = integrationPayloadService.getIntegrationPayloadByEventId(eventId);
+        IntegrationPayload integrationPayload = payloadRedisService.getIntegrationPayloadByEventId(eventId);
 
         if(integrationPayload==null){
             // pagerduty..? 레디스에 아이디가 없다.....
-            pagerDutyService.sendPagerDuty(eventId, PagerDutyEnum.CauseMsg.CANNOT_FIND_EVENT_ID_IN_WEBHOOK.getCauseMsg());
+            notificationService.sendNotification(eventId, NotiErrorMsg.CANNOT_FIND_EVENT_ID_IN_WEBHOOK.getNotiErrorMsg());
         } else {
             String status = integrationPayload.getIncidentCreationStatus();
             // 시간 비교
             if(compareTimeZone(integrationPayload.getIntegrationCallTime(), controllerTime)){ // 정상일 때
-                integrationPayloadService.changeIncidentStatus(eventId, Constants.INCIDENT_CREATED); // 상태 변경
+                payloadRedisService.changeIncidentStatus(eventId, Constants.INCIDENT_CREATED); // 상태 변경
                 log.warn("{} 의 incidentStatus 를 not_created -> created 로 변경", eventId);
 
             } else { // 5분 지났을 때
-                integrationPayloadService.changeIncidentStatus(eventId, Constants.INCIDENT_TIMEOUT); // 상태 변경
-                pagerDutyService.sendPagerDuty(integrationPayloadService.getIntegrationPayloadByEventId(eventId),
-                        PagerDutyEnum.CauseMsg.TIMEOUT_IN_WEBHOOK.getCauseMsg());
+                payloadRedisService.changeIncidentStatus(eventId, Constants.INCIDENT_TIMEOUT); // 상태 변경
+                notificationService.sendNotification(payloadRedisService.getIntegrationPayloadByEventId(eventId),
+                        NotiErrorMsg.TIMEOUT_IN_WEBHOOK.getNotiErrorMsg());
             }
         }
 
     }
 
-    public void jobFacade(){
+    public void incidentJobFacade(){
 
-        Iterable<EventId> list =  eventIdService.getEventIdChkList();
+        Iterable<EventId> list =  eventIdListRedisService.getEventIdChkList();
 
         for (EventId eventIdObj : list) {
             // eventIdList를 순회한다.
             String eventId = eventIdObj.getEventId();
 
             // 하나의 eventId 로 저장된 정보 불러온다.
-            IntegrationPayload integrationPayload = integrationPayloadService.getIntegrationPayloadByEventId(eventId);
+            IntegrationPayload integrationPayload = payloadRedisService.getIntegrationPayloadByEventId(eventId);
             if (integrationPayload == null) continue;
 
             String nowStatus = integrationPayload.getIncidentCreationStatus();
@@ -64,13 +64,13 @@ public class IncidentService {
                     continue;
                     // 아직 5분 안지났으면 아무것도 하지않는다.
                 } else {
-                    integrationPayloadService.changeIncidentStatus(eventId, Constants.INCIDENT_TIMEOUT); // 5분 지났으면 timeout으로 상태 변경
+                    payloadRedisService.changeIncidentStatus(eventId, Constants.INCIDENT_TIMEOUT); // 5분 지났으면 timeout으로 상태 변경
                     //pagerduty 발송
-                    pagerDutyService.sendPagerDuty(integrationPayload, PagerDutyEnum.CauseMsg.TIMEOUT_IN_INCIDENTJOB.getCauseMsg());
+                    notificationService.sendNotification(integrationPayload, NotiErrorMsg.TIMEOUT_IN_INCIDENTJOB.getNotiErrorMsg());
                 }
             }
             // CREATED 상태와 TIMEOUT 상태는 리스트에서 지운다.
-            eventIdService.deleteEventCheckListByEventId(eventId);
+            eventIdListRedisService.deleteEventCheckListByEventId(eventId);
         }
 
     }

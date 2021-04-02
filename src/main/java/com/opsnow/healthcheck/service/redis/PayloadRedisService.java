@@ -13,7 +13,7 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class IntegrationPayloadService {
+public class PayloadRedisService {
 
     private final PayloadRepository payloadRepository;
 
