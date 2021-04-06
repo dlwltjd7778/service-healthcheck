@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opsnow.healthcheck.common.constants.Constants;
 import com.opsnow.healthcheck.common.CustomRestTemplate;
 import com.opsnow.healthcheck.model.alertnow.IntegrationPayload;
+import com.opsnow.healthcheck.model.pagerduty.CustomDetails;
 import com.opsnow.healthcheck.model.pagerduty.PagerDutyPayload;
 import com.opsnow.healthcheck.model.pagerduty.Payload;
 import lombok.RequiredArgsConstructor;
@@ -28,18 +29,19 @@ public class NotificationService {
         customRestTemplate.callPostRestTemplate(reqBody, Constants.PAGERDUTY_URL);
     }
 
-
-    public void sendNotification(IntegrationPayload integrationPayload, String msg) {
+    public void sendNotification(IntegrationPayload integrationPayload, String msg, String errorMsg) {
         String summary = String.format(Constants.NOTIFICATION_SUMMARY_FORMAT
-                                        ,integrationPayload.getEnvironment()
-                                        ,integrationPayload.getIntegrationType()
-                                        ,integrationPayload.getEventId()
-                                        ,msg);
+                ,integrationPayload.getEnvironment()
+                ,integrationPayload.getIntegrationType()
+                ,integrationPayload.getEventId()
+                ,msg);
+
+        CustomDetails customDetails = CustomDetails.builder().integrationPayload(integrationPayload).errorMsg(errorMsg).build();
         PagerDutyPayload payload = PagerDutyPayload.builder().payload(
                 Payload.builder()
                         .summary(summary)
                         .source(integrationPayload.getEventId())
-                        .custom_details(integrationPayload)
+                        .custom_details(customDetails)
                         .build())
                 .build();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -48,7 +50,6 @@ public class NotificationService {
         log.info("PAGERDUTY SUMMARY >> {}", summary);
     }
 
-    //임시......
     public void sendNotification(){
         PagerDutyPayload payload = PagerDutyPayload.builder().payload(Payload.builder().build()).build();
         ObjectMapper objectMapper = new ObjectMapper();

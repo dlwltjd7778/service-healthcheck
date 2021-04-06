@@ -13,5 +13,5 @@ public class Payload{
     private String source = Constants.PAYLOAD_SOURCE;
     @Builder.Default
     private String severity = Constants.PAYLOAD_SEVERITY;
-    private Object custom_details;
+    private CustomDetails custom_details;
 }

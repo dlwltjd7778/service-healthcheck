@@ -39,8 +39,9 @@ public class IncidentService {
 
             } else { // 5분 지났을 때
                 payloadRedisService.changeIncidentStatus(eventId, Constants.INCIDENT_TIMEOUT); // 상태 변경
-                notificationService.sendNotification(payloadRedisService.getIntegrationPayloadByEventId(eventId),
-                        NotiErrorMsg.TIMEOUT_IN_WEBHOOK.getNotiErrorMsg());
+                notificationService.sendNotification(payloadRedisService.getIntegrationPayloadByEventId(eventId)
+                        , NotiErrorMsg.TIMEOUT_IN_WEBHOOK.getNotiErrorMsg()
+                        , NotiErrorMsg.TIMEOUT_IN_WEBHOOK.getNotiErrorMsg());
             }
         }
 
@@ -66,7 +67,9 @@ public class IncidentService {
                 } else {
                     payloadRedisService.changeIncidentStatus(eventId, Constants.INCIDENT_TIMEOUT); // 5분 지났으면 timeout으로 상태 변경
                     //pagerduty 발송
-                    notificationService.sendNotification(integrationPayload, NotiErrorMsg.TIMEOUT_IN_INCIDENTJOB.getNotiErrorMsg());
+                    notificationService.sendNotification(integrationPayload
+                            , NotiErrorMsg.TIMEOUT_IN_INCIDENTJOB.getNotiErrorMsg()
+                            , NotiErrorMsg.TIMEOUT_IN_INCIDENTJOB.getNotiErrorMsg());
                 }
             }
             // CREATED 상태와 TIMEOUT 상태는 리스트에서 지운다.

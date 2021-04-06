@@ -16,7 +16,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class IntegrationAPIService {
+public class IntegrationService {
 
     private final CustomRestTemplate customRestTemplate;
     private final EventIdListRedisService eventIdListRedisService;
@@ -42,7 +42,7 @@ public class IntegrationAPIService {
         if (!( "ok".equals(resMap.get("msg")) && "200".equals(resMap.get("code")))){
             eventIdListRedisService.deleteEventCheckListByEventId(eventId); // 체크리스트에서 삭제해주자
             payloadRedisService.deleteIntegrationPayloadByEventId(eventId); // 실제 저장된 데이터에서 삭제해주자
-            notificationService.sendNotification(integrationPayload, (String)resMap.get("msg"));
+            notificationService.sendNotification(integrationPayload, (String)resMap.get("msg"), (String)resMap.get("cause"));
         }
     }
 }

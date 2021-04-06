@@ -39,10 +39,11 @@ public class CustomRestTemplate {
             resMap = mapper.readValue(response.getBody(), Map.class);
 
         } catch (HttpStatusCodeException e){
-            resMap.put("msg", NotiErrorMsg.NOT_200_OK.getNotiErrorMsg() + " : " + e.getStatusCode().toString());
+            resMap.put("msg", NotiErrorMsg.NOT_200_OK.getNotiErrorMsg() + " : " + e.getClass().getName() + "-" + e.getStatusCode().toString());
             log.error("ERROR MSG - {}", resMap.get("msg"), e);
         } catch (Exception e){
-            resMap.put("msg",NotiErrorMsg.INTEGRATION_API_RESTTEMPLATE_ERROR.getNotiErrorMsg() + e.getMessage());
+            resMap.put("msg",NotiErrorMsg.INTEGRATION_API_RESTTEMPLATE_ERROR.getNotiErrorMsg() + e.getClass().getName());
+            resMap.put("cause", e.getMessage());
             log.error("ERROR MSG - {}", resMap.get("msg"), e);
         }
 

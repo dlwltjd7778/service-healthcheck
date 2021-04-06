@@ -13,10 +13,8 @@ public class Constants {
     public final static String PAYLOAD_SUMMARY = "Integration API call Error";
     public final static String PAYLOAD_SOURCE = "host name or FQDN here";
     public final static String PAYLOAD_SEVERITY = "critical";
-    public final static String ROUTING_KEY = "10eb9a1b52e44409c007e2a274025fe2";
+    public final static String ROUTING_KEY = "3e6fccb4ddba4904d0298d87598e49dc";
     public final static String EVENT_ACTION = "trigger";
-
-
 
     // JobScheduler 주기
     public final static String INTEGRATION_CRON_EXPRESSION = "0 0/1 * * * *";

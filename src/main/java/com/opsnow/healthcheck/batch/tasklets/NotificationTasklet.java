@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class PagerDutyTasklet implements Tasklet {
+public class NotificationTasklet implements Tasklet {
 
     @NonNull
     private final NotificationService notificationService;

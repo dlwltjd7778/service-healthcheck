@@ -22,7 +22,6 @@ public class Scheduler {
     private final IncidentJobConfig incidentJobConfig;
     private final JobLauncher jobLauncher;
 
-    //    @Scheduled(fixedDelay = Constants.SEC * 1000L)
     @Scheduled(cron = Constants.INTEGRATION_CRON_EXPRESSION)
     public void executeIntegrationJob() {
         try {
