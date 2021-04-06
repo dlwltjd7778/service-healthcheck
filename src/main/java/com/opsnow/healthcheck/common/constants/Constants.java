@@ -31,7 +31,7 @@ public class Constants {
     public final static int SLA_MINUTES = 5;
 
     // Redis TTL
-    public final static int INTEGRATION_PAYLOAD_TTL = 10;
+    public final static int INTEGRATION_PAYLOAD_TTL = 60 * 10;
 
     public static String INTEGRATION_ENVIRONMENT;
     public static String INTEGRATION_TYPE;

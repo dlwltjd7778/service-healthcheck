@@ -40,6 +40,7 @@ public class PayloadRedisService {
 
     public void deleteIntegrationPayloadByEventId(String eventId){
         payloadRepository.deleteById(eventId);
+        log.info("delete from HealthCheckPayload - eventId : {}",eventId);
     }
     
     public void changeIncidentStatus(String eventId, String status){
