@@ -20,6 +20,6 @@ public class IntegrationPayload {
     private String url;                          // url
     private String integrationType;              // integration type
     private ZonedDateTime integrationCallTime;   // call time
-    private String incidentCreationStatus;
+    private String incidentCreationStatus;       // incident 생성 여부
 
 }

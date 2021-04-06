@@ -1,7 +1,7 @@
 package com.opsnow.healthcheck.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opsnow.healthcheck.common.constants.NotiErrorMsg;
+import com.opsnow.healthcheck.common.constants.notification.NotiErrorMsg;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.client.RestTemplateBuilder;

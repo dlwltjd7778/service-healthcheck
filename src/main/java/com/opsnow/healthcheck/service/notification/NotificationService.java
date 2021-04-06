@@ -21,12 +21,18 @@ public class NotificationService {
     private final CustomRestTemplate customRestTemplate;
     // https://jiseonglee.pagerduty.com
 
+    // overloading
     public void sendNotification(String eventId, String msg) {
-        log.info("PAGERDUTY >> EventId : {}, msg : {}", eventId, msg);
-        PagerDutyPayload payload = PagerDutyPayload.builder().payload(Payload.builder().summary(msg).source(eventId).build()).build();
+        PagerDutyPayload payload = PagerDutyPayload.builder()
+                .payload(Payload.builder()
+                        .summary(msg)
+                        .source(eventId)
+                        .build())
+                .build();
         ObjectMapper objectMapper = new ObjectMapper();
         Map reqBody = objectMapper.convertValue(payload,Map.class);
         customRestTemplate.callPostRestTemplate(reqBody, Constants.PAGERDUTY_URL);
+        log.info("PAGERDUTY >> EventId : {}, msg : {}", eventId, msg);
     }
 
     public void sendNotification(IntegrationPayload integrationPayload, String msg, String errorMsg) {

@@ -33,7 +33,7 @@ public class Scheduler {
         }
     }
 
-    @Scheduled(cron = Constants.INCIDENT_CRON_EXPRESSION)
+//    @Scheduled(cron = Constants.INCIDENT_CRON_EXPRESSION)
     public void executeIncidentJob() {
         try {
             jobLauncher.run(

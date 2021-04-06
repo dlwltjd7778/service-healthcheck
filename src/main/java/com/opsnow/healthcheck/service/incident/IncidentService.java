@@ -1,7 +1,7 @@
 package com.opsnow.healthcheck.service.incident;
 
 import com.opsnow.healthcheck.common.constants.Constants;
-import com.opsnow.healthcheck.common.constants.NotiErrorMsg;
+import com.opsnow.healthcheck.common.constants.notification.NotiErrorMsg;
 import com.opsnow.healthcheck.model.alertnow.EventId;
 import com.opsnow.healthcheck.model.alertnow.IntegrationPayload;
 import com.opsnow.healthcheck.service.notification.NotificationService;
@@ -29,7 +29,7 @@ public class IncidentService {
 
         if(integrationPayload==null){
             // pagerduty..? 레디스에 아이디가 없다.....
-            notificationService.sendNotification(eventId, NotiErrorMsg.CANNOT_FIND_EVENT_ID_IN_WEBHOOK.getNotiErrorMsg());
+            notificationService.sendNotification(eventId, NotiErrorMsg.CANNOT_FIND_EVENT_ID_FROM_WEBHOOK.getNotiErrorMsg());
         } else {
             String status = integrationPayload.getIncidentCreationStatus();
             // 시간 비교
@@ -57,21 +57,24 @@ public class IncidentService {
 
             // 하나의 eventId 로 저장된 정보 불러온다.
             IntegrationPayload integrationPayload = payloadRedisService.getIntegrationPayloadByEventId(eventId);
-            if (integrationPayload == null) continue;
-
-            String nowStatus = integrationPayload.getIncidentCreationStatus();
-            if (nowStatus.equals(Constants.INCIDENT_NOT_CREATED)) {
-                if (compareTimeZone(integrationPayload.getIntegrationCallTime(), ZonedDateTime.now())) {
-                    continue;
-                    // 아직 5분 안지났으면 아무것도 하지않는다.
-                } else {
-                    payloadRedisService.changeIncidentStatus(eventId, Constants.INCIDENT_TIMEOUT); // 5분 지났으면 timeout으로 상태 변경
-                    //pagerduty 발송
-                    notificationService.sendNotification(integrationPayload
-                            , NotiErrorMsg.TIMEOUT_IN_INCIDENTJOB.getNotiErrorMsg()
-                            , NotiErrorMsg.TIMEOUT_IN_INCIDENTJOB.getNotiErrorMsg());
+            if (integrationPayload == null) {
+                notificationService.sendNotification(eventId, NotiErrorMsg.CANNOT_FIND_EVENT_ID_IN_REDIS.getNotiErrorMsg());
+            } else {
+                String nowStatus = integrationPayload.getIncidentCreationStatus();
+                if (nowStatus.equals(Constants.INCIDENT_NOT_CREATED)) {
+                    if (compareTimeZone(integrationPayload.getIntegrationCallTime(), ZonedDateTime.now())) {
+                        continue;
+                        // 아직 5분 안지났으면 아무것도 하지않는다.
+                    } else {
+                        payloadRedisService.changeIncidentStatus(eventId, Constants.INCIDENT_TIMEOUT); // 5분 지났으면 timeout으로 상태 변경
+                        //pagerduty 발송
+                        notificationService.sendNotification(integrationPayload
+                                , NotiErrorMsg.TIMEOUT_IN_INCIDENTJOB.getNotiErrorMsg()
+                                , NotiErrorMsg.TIMEOUT_IN_INCIDENTJOB.getNotiErrorMsg());
+                    }
                 }
             }
+
             // CREATED 상태와 TIMEOUT 상태는 리스트에서 지운다.
             eventIdListRedisService.deleteEventCheckListByEventId(eventId);
         }

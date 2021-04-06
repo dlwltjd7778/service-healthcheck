@@ -1,5 +1,7 @@
 package com.opsnow.healthcheck.common.constants;
 
+import com.opsnow.healthcheck.common.constants.integration.IntegrationAPIKey;
+
 public class Constants {
 
     // Format
@@ -20,7 +22,7 @@ public class Constants {
     public final static String INTEGRATION_CRON_EXPRESSION = "0 0/1 * * * *";
     public final static String INCIDENT_CRON_EXPRESSION = "30 0/1 * * * *";
 
-    // Incidents Creation Status
+    // Incidents Creation Status - Redis
     public final static String INCIDENT_CREATED = "created";
     public final static String INCIDENT_NOT_CREATED = "notCreated";
     public final static String INCIDENT_TIMEOUT = "timeout";
@@ -29,10 +31,15 @@ public class Constants {
     public final static int SLA_MINUTES = 5;
 
     // Redis TTL
-    public final static int INTEGRATION_PAYLOAD_TTL = 10000;
+    public final static int INTEGRATION_PAYLOAD_TTL = 10;
 
     public static String INTEGRATION_ENVIRONMENT;
     public static String INTEGRATION_TYPE;
     public static String INTEGRATION_URL;
+
+    // url 만들어줌
+    public static String getIntegrationUrl(IntegrationAPIKey url) {
+        return String.format(Constants.INTEGRATION_URL_FORMAT, url.getEnvType().getDomain(), url.getIntegrationType(), url.getApiKey());
+    }
 
 }
