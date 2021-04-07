@@ -1,6 +1,6 @@
 package com.opsnow.healthcheck.batch.tasklets;
 
-import com.opsnow.healthcheck.service.extension.ExtensionService;
+import com.opsnow.healthcheck.service.incident.IncidentService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,13 +17,13 @@ import org.springframework.stereotype.Component;
 public class IncidentTasklet implements Tasklet {
 
     @NonNull
-    private final ExtensionService extensionService;
+    private final IncidentService incidentService;
 
     @Override
-    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        log.info("incidentTasklet 실행");
+    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) {
+        log.info("IncidentTasklet 실행");
 
-        extensionService.jobFacade();
+        incidentService.incidentJobFacade();
 
         return RepeatStatus.FINISHED;
     }

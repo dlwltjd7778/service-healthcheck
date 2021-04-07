@@ -11,17 +11,17 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class IntegrationPayloadServiceImpl implements IntegrationPayloadService {
+public class StandardPayloadServiceImpl implements IntegrationPayloadService {
 
     private final EventService eventService;
 
     @Override
-    public Map<String, String> makeStandardPayload() {
+    public Map<String, String> makePayload() {
         log.info(">> makeStandardPayload 시작");
 
         // event id와 summary 가져오기
         String eventId = eventService.getEventId();
-        String eventSummary = eventService.getEventSummary();
+        String eventSummary = eventService.getEventSummary(eventId);
         log.info("eventId: {}, eventSummary: {}", eventId, eventSummary);
 
         // body 작성

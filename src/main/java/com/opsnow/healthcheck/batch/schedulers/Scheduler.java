@@ -2,7 +2,7 @@ package com.opsnow.healthcheck.batch.schedulers;
 
 import com.opsnow.healthcheck.batch.jobs.IncidentJobConfig;
 import com.opsnow.healthcheck.batch.jobs.IntegrationJobConfig;
-import com.opsnow.healthcheck.common.Constants;
+import com.opsnow.healthcheck.common.constants.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobExecutionException;
@@ -22,7 +22,6 @@ public class Scheduler {
     private final IncidentJobConfig incidentJobConfig;
     private final JobLauncher jobLauncher;
 
-    //    @Scheduled(fixedDelay = Constants.SEC * 1000L)
     @Scheduled(cron = Constants.INTEGRATION_CRON_EXPRESSION)
     public void executeIntegrationJob() {
         try {
@@ -34,7 +33,7 @@ public class Scheduler {
         }
     }
 
-    @Scheduled(cron = Constants.INCIDENT_CRON_EXPRESSION)
+//    @Scheduled(cron = Constants.INCIDENT_CRON_EXPRESSION)
     public void executeIncidentJob() {
         try {
             jobLauncher.run(

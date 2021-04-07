@@ -1,7 +1,7 @@
 package com.opsnow.healthcheck.model.alertnow;
 
 
-import com.opsnow.healthcheck.common.Constants;
+import com.opsnow.healthcheck.common.constants.Constants;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -16,9 +16,10 @@ public class IntegrationPayload {
     @Id
     private String eventId;                      // uuid
     private String eventSummary;                 // summary
+    private String environment;                  // env
     private String url;                          // url
     private String integrationType;              // integration type
     private ZonedDateTime integrationCallTime;   // call time
-    private String incidentCreationStatus;
+    private String incidentCreationStatus;       // incident 생성 여부
 
 }
