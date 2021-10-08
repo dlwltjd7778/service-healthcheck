@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: lightsaber-healthcheck
+  batch:
+    job:
+      enabled: false #CommandLineRunner는 어플리케이션 구동시점에 특정 작업이 실행될 수 있도록 해주는 역할임, 스케쥴러를 사용할 것이기 때문에 구동시점에 동작하는 작업을 제거해주는 설정을 추가한다
+  redis:
+    port: 6379
+    host: 127.0.0.1
+    password: healthcheckfpeltm
+
+# /Users/jiseonglee/logs /data/deploy/logs
+logging:
+  file:
+    name: ${spring.application.name}.log
+    path: /data/deploy/logs
+    max-history: 30
+  level:
+    root: warn
+    com.opsnow: info
+    org.springframework.web.filter: debug
+
+server:
+  tomcat:
+    accesslog:
+      enabled: true
+      pattern: '[%h] [%{yyyy-MM-dd HH:mm:ss}t] [%r] [%s] [%bbytes] [%Dms] [%{BSP_isRememberEmail}c-%{BSP_LangCode}c] [%{User-Agent}i] [%I]'
+#      pattern: '%h %l %u %t "%r" %s %b "%{Referer}i" "%{User-Agent}i"'
+
+      directory: healthcheck/accesslogs
+    basedir: /data/deploy/logs

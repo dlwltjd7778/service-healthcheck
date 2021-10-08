@@ -10,4 +10,5 @@ public class CustomDetails {
 
     private IntegrationPayload integrationPayload;
     private String errorMsg;
+    private String integrationCallTime;
 }

@@ -2,6 +2,7 @@ package com.opsnow.healthcheck.service.redis;
 
 import com.opsnow.healthcheck.model.alertnow.EventId;
 import com.opsnow.healthcheck.repository.EventIdRepository;
+import io.netty.channel.EventLoopGroup;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,8 @@ public class EventIdListRedisService {
 
     // event id 하나 리스트에 저장
     public void addEventCheckList(String eventId){
-        eventIdRepository.save(EventId.builder().eventId(eventId).build());
-        log.info("add to EventIdList : {}", eventId);
+        EventId id = eventIdRepository.save(EventId.builder().eventId(eventId).build());
+        log.info("add to EventIdList : {}", id);
     }
 
     // event id 하나 삭제

@@ -17,19 +17,19 @@ public class PayloadRedisService {
 
     private final PayloadRepository payloadRepository;
 
-    public IntegrationPayload saveEventData(String eventId, String eventSummary, String integrationType, ZonedDateTime integrationCallTime, String url, String env){
+    public IntegrationPayload saveEventData(String eventId, String eventSummary, String integrationType, ZonedDateTime integrationCallTime, String integrationKey, String env){
         IntegrationPayload integrationPayload = IntegrationPayload.builder()
                 .eventId(eventId)
                 .eventSummary(eventSummary)
                 .integrationType(integrationType)
-                .url(url)
+                .integrationKey(integrationKey)
                 .integrationCallTime(integrationCallTime)
                 .incidentCreationStatus(Constants.INCIDENT_NOT_CREATED)
-                .environment(env)
+                .integrationEnvironment(env)
                 .build();
-        payloadRepository.save(integrationPayload);
+        IntegrationPayload result = payloadRepository.save(integrationPayload);
         log.info("save IntegrationPayload in Redis : {}", integrationPayload );
-        return integrationPayload;
+        return result;
     }
 
     // eventId를 가지고 조회
@@ -45,8 +45,10 @@ public class PayloadRedisService {
     
     public void changeIncidentStatus(String eventId, String status){
         IntegrationPayload integrationPayload = getIntegrationPayloadByEventId(eventId);
+        String nowStatus = integrationPayload.getIncidentCreationStatus();
         integrationPayload.setIncidentCreationStatus(status);
         payloadRepository.save(integrationPayload);
+        log.warn("{} 의 incidentCreationStatus 를 {} -> {} 로 변경", eventId, nowStatus, status);
     }
 
 }

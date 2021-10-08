@@ -31,10 +31,11 @@ public class Constants {
     public final static int SLA_MINUTES = 5;
 
     // Redis TTL
-    public final static int INTEGRATION_PAYLOAD_TTL = 60 * 10;
+    public final static int INTEGRATION_PAYLOAD_TTL = 60 * 10 * 12;
 
     public static String INTEGRATION_ENVIRONMENT;
     public static String INTEGRATION_TYPE;
+    public static String INTEGRATION_KEY;
     public static String INTEGRATION_URL;
 
     // url 만들어줌

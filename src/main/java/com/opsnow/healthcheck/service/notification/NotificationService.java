@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 @Slf4j
@@ -19,7 +20,6 @@ import java.util.Map;
 public class NotificationService {
 
     private final CustomRestTemplate customRestTemplate;
-    // https://jiseonglee.pagerduty.com
 
     // overloading
     public void sendNotification(String eventId, String msg) {
@@ -32,17 +32,19 @@ public class NotificationService {
         ObjectMapper objectMapper = new ObjectMapper();
         Map reqBody = objectMapper.convertValue(payload,Map.class);
         customRestTemplate.callPostRestTemplate(reqBody, Constants.PAGERDUTY_URL);
-        log.info("PAGERDUTY >> EventId : {}, msg : {}", eventId, msg);
+        log.info("PAGERDUTY - EventId : {}, msg : {}", eventId, msg);
     }
 
     public void sendNotification(IntegrationPayload integrationPayload, String msg, String errorMsg) {
         String summary = String.format(Constants.NOTIFICATION_SUMMARY_FORMAT
-                ,integrationPayload.getEnvironment()
+                ,integrationPayload.getIntegrationEnvironment()
                 ,integrationPayload.getIntegrationType()
                 ,integrationPayload.getEventId()
                 ,msg);
 
-        CustomDetails customDetails = CustomDetails.builder().integrationPayload(integrationPayload).errorMsg(errorMsg).build();
+        String integrationCallTime = integrationPayload.getIntegrationCallTime().toString();
+        integrationPayload.setIntegrationCallTime(null);
+        CustomDetails customDetails = CustomDetails.builder().integrationPayload(integrationPayload).errorMsg(errorMsg).integrationCallTime(integrationCallTime).build();
         PagerDutyPayload payload = PagerDutyPayload.builder().payload(
                 Payload.builder()
                         .summary(summary)
@@ -53,7 +55,7 @@ public class NotificationService {
         ObjectMapper objectMapper = new ObjectMapper();
         Map reqBody = objectMapper.convertValue(payload,Map.class);
         customRestTemplate.callPostRestTemplate(reqBody, Constants.PAGERDUTY_URL);
-        log.info("PAGERDUTY SUMMARY >> {}", summary);
+        log.info("PAGERDUTY SUMMARY - {}", summary);
     }
 
     public void sendNotification(){

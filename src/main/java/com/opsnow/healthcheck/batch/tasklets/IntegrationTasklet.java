@@ -22,10 +22,11 @@ public class IntegrationTasklet implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) {
-
+        log.info("****************   START IntegrationTasklet(IntegrationJob)   ****************");
         for(IntegrationAPIKey apiKey : IntegrationAPIKey.values()){
             Constants.INTEGRATION_ENVIRONMENT = apiKey.getEnvType().toString();
             Constants.INTEGRATION_TYPE = apiKey.getIntegrationType().toString();
+            Constants.INTEGRATION_KEY = apiKey.getApiKey();
             Constants.INTEGRATION_URL = Constants.getIntegrationUrl(apiKey);
             log.info("IntegrationTasklet 실행 : ENV - {}, INTEGRATION_TYPE - {}, INTEGRATION_URL - {}"
                     ,Constants.INTEGRATION_ENVIRONMENT
@@ -33,7 +34,7 @@ public class IntegrationTasklet implements Tasklet {
                     ,Constants.INTEGRATION_URL);
             integrationService.sendIntegrationAPI();
         }
-
+        log.info("****************   END IntegrationTasklet(IntegrationJob)   ****************");
         return RepeatStatus.FINISHED;
     }
 

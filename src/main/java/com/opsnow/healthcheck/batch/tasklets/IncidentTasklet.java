@@ -21,10 +21,9 @@ public class IncidentTasklet implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) {
-        log.info("IncidentTasklet 실행");
-
+        log.info("-*-*-*-*-*-*-*-   START IncidentTasklet(IncidentJob)   -*-*-*-*-*-*-*-");
         incidentService.incidentJobFacade();
-
+        log.info("-*-*-*-*-*-*-*-   END IncidentTasklet(IncidentJob)   -*-*-*-*-*-*-*-");
         return RepeatStatus.FINISHED;
     }
 }
