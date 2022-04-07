@@ -3,7 +3,7 @@
     <!-- use Spring default values -->
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
 
-    <springProperty scope="context" name="springAppName" source="spring.application.name" defaultValue="lightsaber-healthcheck"/>
+    <springProperty scope="context" name="springAppName" source="spring.application.name" defaultValue="test-healthcheck"/>
     <springProperty scope="context" name="loggingFilePath" source="logging.file.path" defaultValue="."/>
     <springProperty scope="context" name="loggingFileMaxHistory" source="logging.file.max-history" defaultValue="365"/>
 
