@@ -1,4 +1,4 @@
-package com.opsnow.healthcheck;
+package com.test.healthcheck;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
