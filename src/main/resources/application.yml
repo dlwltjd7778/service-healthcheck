@@ -17,7 +17,7 @@ logging:
     max-history: 30
   level:
     root: warn
-    com.opsnow: info
+    com.test: info
     org.springframework.web.filter: debug
 
 server:
